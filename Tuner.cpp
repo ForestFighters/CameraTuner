@@ -9,13 +9,22 @@ using namespace std;
 
 enum Colours { Red2, Red, Green, Blue, Yellow };
 
-int lowH[5] = {   0, 150, 51,  75, 20 };
-int highH[5] = { 10, 230, 75, 107, 35 };
+//int lowH[5] = {   0, 150, 51,  75, 20 };
+//int highH[5] = { 10, 230, 75, 107, 35 };
 
-int lowS[5] = {  158, 128, 127, 127,  85 };
-int highS[5] = { 255, 255, 255, 255, 255 };
+//int lowS[5] = {  158, 128, 127, 127,  85 };
+//int highS[5] = { 255, 255, 255, 255, 255 };
 
-int lowV[5] = {  158,   0, 127, 127, 150 };
+//int lowV[5] = {  158,   0, 127, 127, 150 };
+//int highV[5] = { 255, 255, 255, 255, 255 };
+
+int lowH[5] = {   0, 150, 90,  90, 20 };
+int highH[5] = { 10, 230, 119, 119, 35 };
+
+int lowS[5] = {  158, 128, 96, 200,    0 };
+int highS[5] = { 255, 255, 191, 255, 117 };
+
+int lowV[5] = {  158,   0,   0,   0, 150 };
 int highV[5] = { 255, 255, 255, 255, 255 };
 
 typedef struct custom_data
