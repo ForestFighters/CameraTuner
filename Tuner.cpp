@@ -18,14 +18,23 @@ enum Colours { Red2, Red, Green, Blue, Yellow };
 //int lowV[5] = {  158,   0, 127, 127, 150 };
 //int highV[5] = { 255, 255, 255, 255, 255 };
 
-int lowH[5] = {   0, 150, 90,  90, 20 };
-int highH[5] = { 10, 230, 119, 119, 35 };
+//int lowH[5] = {   0, 150, 90,  90, 20 };
+//int highH[5] = { 10, 230, 119, 119, 35 };
 
-int lowS[5] = {  158, 128, 96, 200,    0 };
-int highS[5] = { 255, 255, 191, 255, 117 };
+//int lowS[5] = {  158, 128, 96, 200,    0 };
+//int highS[5] = { 255, 255, 191, 255, 117 };
 
-int lowV[5] = {  158,   0,   0,   0, 150 };
-int highV[5] = { 255, 255, 255, 255, 255 };
+//int lowV[5] = {  158,   0,   0,   0, 150 };
+//int highV[5] = { 255, 255, 255, 255, 255 };
+
+int lowH[5] =    {   0, 150, 44,  90, 22 };
+int highH[5] =   {  10, 230, 89, 119, 46 };
+
+int lowS[5] =    {  71, 128,  30,  200,   0 };
+int highS[5] =   { 255, 255, 166,  255, 132 };
+
+int lowV[5] =    { 158,   0,  90,   0, 209 };
+int highV[5] =   { 255, 255, 143, 255, 255 };
 
 typedef struct custom_data
 {
@@ -151,13 +160,18 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
 		 cout << "Cannot read a frame from video stream" << endl;
 		 break;
 	}
+	
+	Mat imgROI;
+    
+    //Extract a region of interest from the grey scale frame
+    Rect roi(0,200,640,80);  
+    imgOriginal(roi).copyTo(imgROI);
 
     Mat imgHSV;
-
-    cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
- 
+    cvtColor(imgROI, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
+    //cvtColor(imgROI, imgHSV, COLOR_BGR2YUV); //Convert the captured frame from BGR to YUV
+    
     Mat imgThresholded;
-
     inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
       
     //morphological opening (remove small objects from the foreground)
@@ -168,8 +182,12 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
     dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
     erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
 
+    Moments oMoments = moments(imgThresholded);
+    Point2f center(oMoments.m10 / oMoments.m00, 320);
+    circle( imgThresholded, center, 5, Scalar(128, 128, 128), -1, 8, 0);
+    
     imshow("Thresholded Image", imgThresholded); //show the thresholded image
-    imshow("Original", imgOriginal); //show the original image
+    imshow("Original", imgROI); //show the original image
 
     if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
     {
