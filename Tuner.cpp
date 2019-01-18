@@ -4,10 +4,13 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+#define CONTROLYUV "Control YUV"
+#define CONTROLHSV "Control HSV"
+
 using namespace cv;
 using namespace std;
 
-enum Colours { Red2, Red, Green, Blue, Yellow };
+enum Colours { Red2, Red, Green, Blue, Yellow, None };
 
 //int lowH[5] = {   0, 150, 51,  75, 20 };
 //int highH[5] = { 10, 230, 75, 107, 35 };
@@ -35,6 +38,10 @@ int highS[5] =   { 255, 255, 166,  255, 132 };
 
 int lowV[5] =    { 158,   0,  90,   0, 209 };
 int highV[5] =   { 255, 255, 143, 255, 255 };
+
+int Hue = 0;
+int Saturation = 0;
+int Value = 0;
 
 typedef struct custom_data
 {
@@ -91,7 +98,22 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
     }   
     // unlock mutex
 	pthread_mutex_unlock(&ptr->mtx);
-}    
+} 
+
+void onMouse(int event, int x, int y, int flags, void* param) // now it's in param
+{
+    Mat &img = *((Mat*)param); //cast and deref the param
+
+    if (event == EVENT_LBUTTONDOWN)
+    {
+        Vec3b val = img.at<Vec3b>(y,x); // opencv is row-major! 
+        cout << "x= " << x << " y= " << y << "val= "<<val<< endl;
+        
+        Hue = val[0];
+        Saturation = val[1];
+        Value = val[2];
+    }
+}  
 
 
  int main( int argc, char** argv )
@@ -111,15 +133,15 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
 	}
 
 	
-	namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
+	namedWindow(CONTROLYUV, CV_WINDOW_AUTOSIZE); //create a window called CONTROLYUV
 
 	Mat imgControl(150,300, CV_8UC3, Scalar(200, 200, 200));
 	
 	custom_data_t my_data = { -1 };
-	cvSetMouseCallback("Control", my_button_cb, &my_data ); 
+	cvSetMouseCallback(CONTROLYUV, my_button_cb, &my_data ); 
 		
 	int iLowH = 0;
-	int iHighH = 179;
+	int iHighH = 255;
 
 	int iLowS = 0; 
 	int iHighS = 255;
@@ -127,14 +149,14 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
 	int iLowV = 0;
 	int iHighV = 255;
 
-	//Create trackbars in "Control" window
+	//Create trackbars in CONTROLYUV window
 	
-	cvCreateTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
-	cvCreateTrackbar("HighH", "Control", &iHighH, 179);
-	cvCreateTrackbar("LowS", "Control", &iLowS, 255); //Saturation (0 - 255)
-	cvCreateTrackbar("HighS", "Control", &iHighS, 255);
-	cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
-	cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+	cvCreateTrackbar("LowY", CONTROLYUV, &iLowH, 255); //Hue (0 - 179)
+	cvCreateTrackbar("HighY", CONTROLYUV, &iHighH, 255);
+	cvCreateTrackbar("LowU", CONTROLYUV, &iLowS, 255); //Saturation (0 - 255)
+	cvCreateTrackbar("HighU", CONTROLYUV, &iHighS, 255);
+	cvCreateTrackbar("LowV", CONTROLYUV, &iLowV, 255); //Value (0 - 255)
+	cvCreateTrackbar("HighV", CONTROLYUV, &iHighV, 255);
 	
 	string buttonText("Exit");
 	putText(imgControl, buttonText, Point(130, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));
@@ -146,70 +168,96 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
 	rectangle(imgControl,Point(150,50),Point(300,100),Scalar(0,255,255),CV_FILLED);
 	
 	
-	imshow("Control", imgControl);
+	imshow(CONTROLYUV, imgControl);
 
-    
-  while (true)
-  {
 	Mat imgOriginal;
-
-	bool bSuccess = cap.read(imgOriginal); // read a new frame from video
-
-    if (!bSuccess) //if not success, break loop
-	{
-		 cout << "Cannot read a frame from video stream" << endl;
-		 break;
-	}
-	
-	Mat imgROI;
     
-    //Extract a region of interest from the grey scale frame
-    Rect roi(0,200,640,80);  
-    imgOriginal(roi).copyTo(imgROI);
-
+    Mat imgROI;
+    
     Mat imgHSV;
-    cvtColor(imgROI, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
-    //cvtColor(imgROI, imgHSV, COLOR_BGR2YUV); //Convert the captured frame from BGR to YUV
     
-    Mat imgThresholded;
-    inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
-      
-    //morphological opening (remove small objects from the foreground)
-	erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-	dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+    namedWindow("Colour Space", CV_WINDOW_AUTOSIZE);    
+    setMouseCallback("Colour Space", onMouse, &imgHSV); // pass the address
+    
+	while (true)
+	{
+		bool bSuccess = cap.read(imgOriginal); // read a new frame from video
 
-    //morphological closing (fill small holes in the foreground)
-    dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
-    erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+		if (!bSuccess) //if not success, break loop
+		{
+			 cout << "Cannot read a frame from video stream" << endl;
+			 break;
+		}
 
-    Moments oMoments = moments(imgThresholded);
-    Point2f center(oMoments.m10 / oMoments.m00, 320);
-    circle( imgThresholded, center, 5, Scalar(128, 128, 128), -1, 8, 0);
-    
-    imshow("Thresholded Image", imgThresholded); //show the thresholded image
-    imshow("Original", imgROI); //show the original image
+		//Extract a region of interest from the grey scale frame
+		Rect roi(0,200,640,80);  
+		imgOriginal(roi).copyTo(imgROI);
 
-    if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
-    {
-		cout << "esc key is pressed by user" << endl;
-		break; 
-    }
-    
-    pthread_mutex_lock(&my_data.mtx);
-    //std::cout << "The state retrieved by the callback is: " << my_data.state << std::endl;    
-    pthread_mutex_unlock(&my_data.mtx);
-    
-    if( my_data.state == 99 )
-		return 0;
+		//cvtColor(imgROI, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
+		cvtColor(imgROI, imgHSV, COLOR_BGR2YUV); //Convert the captured frame from BGR to YUV
+
+		Mat imgThresholded;
+		inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
+		  
+		//morphological opening (remove small objects from the foreground)
+		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+		dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+
+		//morphological closing (fill small holes in the foreground)
+		dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
+		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+
+		Moments oMoments = moments(imgThresholded);
+		Point2f center(oMoments.m10 / oMoments.m00, 320);
+		circle( imgThresholded, center, 5, Scalar(128, 128, 128), -1, 8, 0);
+
+		imshow("Thresholded Image", imgThresholded); //show the thresholded image
+		imshow("Colour Space", imgHSV);
+		imshow("Original", imgROI); //show the original image
+
+		if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+		{
+			cout << "esc key is pressed by user" << endl;
+			break; 
+		}
+
+		pthread_mutex_lock(&my_data.mtx);
+		//std::cout << "The state retrieved by the callback is: " << my_data.state << std::endl; 		   
+		pthread_mutex_unlock(&my_data.mtx);
+
+		if( my_data.state == 99 )
+			return 0;
+			
+		if( my_data.state >= Red2 && my_data.state <= Yellow ) {
+			/*
+			cvSetTrackbarPos("LowH", CONTROLHSV,  lowH[my_data.state]);
+			cvSetTrackbarPos("HighH", CONTROLHSV, highH[my_data.state]);
+			cvSetTrackbarPos("LowS", CONTROLHSV,  lowS[my_data.state]);
+			cvSetTrackbarPos("HighS", CONTROLHSV, highS[my_data.state]);
+			cvSetTrackbarPos("LowV", CONTROLHSV,  lowV[my_data.state]);
+			cvSetTrackbarPos("HighV", CONTROLHSV, highV[my_data.state]);		
+			*/
+			
+			cvSetTrackbarPos("LowY", CONTROLYUV,  lowH[my_data.state]);
+			cvSetTrackbarPos("HighY", CONTROLYUV, highH[my_data.state]);
+			cvSetTrackbarPos("LowU", CONTROLYUV,  lowS[my_data.state]);
+			cvSetTrackbarPos("HighU", CONTROLYUV, highS[my_data.state]);
+			cvSetTrackbarPos("LowV", CONTROLYUV,  lowV[my_data.state]);
+			cvSetTrackbarPos("HighV", CONTROLYUV, highV[my_data.state]);
+			pthread_mutex_lock(&my_data.mtx);
+			my_data.state = None;
+			pthread_mutex_unlock(&my_data.mtx);		
+		} 
+		else if( Hue > 0) {
+			cvSetTrackbarPos("LowY", CONTROLYUV,  Hue - 15);
+			cvSetTrackbarPos("HighY", CONTROLYUV, Hue + 15);
+			cvSetTrackbarPos("LowU", CONTROLYUV,  Saturation - 15);
+			cvSetTrackbarPos("HighU", CONTROLYUV, Saturation + 15);
+			cvSetTrackbarPos("LowV", CONTROLYUV,  Value - 15);
+			cvSetTrackbarPos("HighV", CONTROLYUV, Value + 15);
+			Hue = 0;
+		}
 		
-	if( my_data.state >= Red2 && my_data.state <= Yellow ) {
-		cvSetTrackbarPos("LowH", "Control",  lowH[my_data.state]);
-		cvSetTrackbarPos("HighH", "Control", highH[my_data.state]);
-		cvSetTrackbarPos("LowS", "Control",  lowS[my_data.state]);
-		cvSetTrackbarPos("HighS", "Control", highS[my_data.state]);
-		cvSetTrackbarPos("LowV", "Control",  lowV[my_data.state]);
-		cvSetTrackbarPos("HighV", "Control", highV[my_data.state]);		
-	}
     
    }
    return 0;
