@@ -159,6 +159,7 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
 			ptr->state = 99;		
 		}
 		else if(saveRect.contains(Point(x, y))) {
+			cout << "storing data to pointer" << endl;
 			StoreToPtr(userdata);
 			ptr->state = 98;
 		}
@@ -311,6 +312,7 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 			return 0;
 		
 		if( my_data.state == 98 ) {
+			cout << "writing pointer to config.json" << endl;
 			Write(string("config.json"), my_data);
 		}
 		if( my_data.state >= Red2 && my_data.state <= Yellow ) {
