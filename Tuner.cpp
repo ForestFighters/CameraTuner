@@ -83,7 +83,6 @@ void StoreToPtr(void* userdata) {
         return;
     }
 	pthread_mutex_lock(&ptr->mtx);
-	char[] stateName;
     switch(ptr->state) {
 		case Red:
 		ptr->red = colour_store_t{
@@ -311,7 +310,7 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 			return 0;
 		
 		if( my_data.state == 98 ) {
-			Write(string("config.json"), my_data)
+			Write(string("config.json"), my_data);
 		}
 		if( my_data.state >= Red2 && my_data.state <= Yellow ) {
 			/*
