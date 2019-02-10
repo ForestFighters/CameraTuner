@@ -64,8 +64,8 @@ typedef struct custom_data
 
 
 void Write(string filename, custom_data_t data) {
-	ofstream myfile;
-	myfile.open(filename);
+	FILE* myfile
+	myfile = fopen("config.json","w");
 	char* output;
 	fprintf(myfile, '[{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.red.name, data.red.hue, data.red.sat, data.red.value);
 	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.red2.name, data.red2.hue, data.red2.sat, data.red2.value);
