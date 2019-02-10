@@ -240,8 +240,9 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 	cvCreateTrackbar("HighV", CONTROLYUV, &iHighV, 255);
 	
 	string buttonText("Exit");
-	putText(imgControl, buttonText, Point(130, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));
-	
+	string saveText("Save");
+	putText(imgControl, buttonText, Point(50, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));
+	putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));
 	rectangle(imgControl,Point(0,0),Point(75,50),Scalar(0,0,128),CV_FILLED);
 	rectangle(imgControl,Point(75,0),Point(150,50),Scalar(0,0,255),CV_FILLED);
 	rectangle(imgControl,Point(150,0),Point(300,50),Scalar(255,0,0),CV_FILLED);
