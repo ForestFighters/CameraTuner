@@ -50,6 +50,29 @@ typedef struct custom_data
     pthread_mutex_t mtx;
 } custom_data_t;
 
+void Save(char[] filename) {
+	pthread_mutex_lock(&ptr->mtx);
+	char[] stateName;
+    switch ptr->state {
+		case Red:
+		stateName = "red"
+		break;
+		case Blue:
+		stateName = "blue"
+		break;
+		case Yellow:
+		stateName = "yellow"
+		break;
+		case Red2:
+		stateName = "red2"
+		break;
+	}
+	ofstream myfile;
+	myfile.open(filename);
+	myfile << '{"colorName": "' + stateName + '", "hue": "' + Hue + '", "saturation": "' + Saturation + '", "value": "' + Value + '"}\n';
+	myfile.close();
+}
+
 void my_button_cb(int event, int x, int y, int flags, void* userdata)
 {
     //std::cout << "@my_button_cb" << std::endl;   
@@ -118,30 +141,6 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
         Value = val[2];
     }
 }  
-
-
-void Save(char[] filename) {
-	pthread_mutex_lock(&ptr->mtx);
-	char[] stateName;
-    switch ptr->state {
-		case Red:
-		stateName = "red"
-		break;
-		case Blue:
-		stateName = "blue"
-		break;
-		case Yellow:
-		stateName = "yellow"
-		break;
-		case Red2:
-		stateName = "red2"
-		break;
-	}
-	ofstream myfile;
-	myfile.open(filename);
-	myfile << '{"colorName": "' + stateName + '", "hue": "' + Hue + '", "saturation": "' + Saturation + '", "value": "' + Value + '"}\n';
-	myfile.close();
-}
 
  int main( int argc, char** argv )
  {
