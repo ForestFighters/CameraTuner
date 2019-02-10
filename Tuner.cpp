@@ -217,7 +217,7 @@ void Save(char[] filename) {
 		}
 
 		//Extract a region of interest from the grey scale frame
-		Rect roi(0,200,640,80);  
+		Rect roi(0,0,640,80);  
 		imgOriginal(roi).copyTo(imgROI);
 
 		//cvtColor(imgROI, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
