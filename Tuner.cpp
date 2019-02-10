@@ -66,12 +66,12 @@ typedef struct custom_data
 void Write(string filename, custom_data_t data) {
 	ofstream myfile;
 	myfile.open(filename);
-	// iterate data
-	myfile << '[{"colorName": "' + data.red.name + '", "hue": "' + data.red.hue + '", "saturation": "' + data.red.sat + '", "value": "' + data.red.value + '"},\n';
-	myfile << '{"colorName": "' + data.red2.name + '", "hue": "' + data.red2.hue + '", "saturation": "' + data.red2.sat + '", "value": "' + data.red2.value + '"},\n';
-	myfile << '[{"colorName": "' + data.green.name + '", "hue": "' + data.green.hue + '", "saturation": "' + data.green.sat + '", "value": "' + data.green.value + '"},\n';
-	myfile << '[{"colorName": "' + data.yellow.name + '", "hue": "' + data.yellow.hue + '", "saturation": "' + data.yellow.sat + '", "value": "' + data.yellow.value + '"},\n';
-	myfile << '[{"colorName": "' + data.blue.name + '", "hue": "' + data.blue.hue + '", "saturation": "' + data.blue.sat + '", "value": "' + data.blue.value + '"}]\n';
+	char* output;
+	fprintf(myfile, '[{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.red.name, data.red.hue, data.red.sat, data.red.value);
+	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.red2.name, data.red2.hue, data.red2.sat, data.red2.value);
+	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.green.name, data.green.hue, data.green.sat, data.green.value);
+	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.blue.name, data.blue.hue, data.blue.sat, data.blue.value);
+	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"}]\n', data.yellow.name, data.yellow.hue, data.yellow.sat, data.yellow.value);
 	myfile.close();
 }
 
