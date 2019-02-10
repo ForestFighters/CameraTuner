@@ -86,7 +86,7 @@ void StoreToPtr(void* userdata) {
 	char[] stateName;
     switch(ptr->state) {
 		case Red:
-		ptr.red = colour_store_t{
+		ptr->red = colour_store_t{
 			name: string("red"),
 			hue: Hue,
 			sat: Saturation,
@@ -94,7 +94,7 @@ void StoreToPtr(void* userdata) {
 		};
 		break;
 		case Blue:
-		ptr.blue = colour_store_t{
+		ptr->blue = colour_store_t{
 			name: string("blue"),
 			hue: Hue,
 			sat: Saturation,
@@ -102,7 +102,7 @@ void StoreToPtr(void* userdata) {
 		};
 		break;
 		case Yellow:
-		ptr.green = colour_store_t{
+		ptr->green = colour_store_t{
 			name: string("green"),
 			hue: Hue,
 			sat: Saturation,
@@ -110,7 +110,7 @@ void StoreToPtr(void* userdata) {
 		};
 		break;
 		case Red2:
-		ptr.red = colour_store_t{
+		ptr->red = colour_store_t{
 			name: string("red2"),
 			hue: Hue,
 			sat: Saturation,
@@ -118,7 +118,7 @@ void StoreToPtr(void* userdata) {
 		};
 		break;
 		case Green:
-		ptr.green = colour_store_t{
+		ptr->green = colour_store_t{
 			name: string("green"),
 			hue: Hue,
 			sat: Saturation,
