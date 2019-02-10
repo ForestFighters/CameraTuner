@@ -84,7 +84,7 @@ void StoreToPtr(void* userdata) {
     }
 	pthread_mutex_lock(&ptr->mtx);
 	char[] stateName;
-    switch ptr->state {
+    switch(ptr->state) {
 		case Red:
 		ptr.red = colour_store_t{
 			name: string("red"),
