@@ -45,7 +45,7 @@ int Saturation = 0;
 int Value = 0;
 
 typedef struct colour_store {
-	char[] name;
+	string name;
 	int hue;
 	int sat;
 	int value;
@@ -63,7 +63,7 @@ typedef struct custom_data
 } custom_data_t;
 
 
-void Write(char[] filename, custom_data_t data) {
+void Write(string filename, custom_data_t data) {
 	ofstream myfile;
 	myfile.open(filename);
 	// iterate data
@@ -87,7 +87,7 @@ void StoreToPtr(void* userdata) {
     switch ptr->state {
 		case Red:
 		ptr.red = colour_store_t{
-			name: "red",
+			name: string("red"),
 			hue: Hue,
 			sat: Saturation,
 			value: Value,
@@ -95,7 +95,7 @@ void StoreToPtr(void* userdata) {
 		break;
 		case Blue:
 		ptr.blue = colour_store_t{
-			name: "blue",
+			name: string("blue"),
 			hue: Hue,
 			sat: Saturation,
 			value: Value,
@@ -103,7 +103,7 @@ void StoreToPtr(void* userdata) {
 		break;
 		case Yellow:
 		ptr.green = colour_store_t{
-			name: "green",
+			name: string("green"),
 			hue: Hue,
 			sat: Saturation,
 			value: Value,
@@ -111,7 +111,7 @@ void StoreToPtr(void* userdata) {
 		break;
 		case Red2:
 		ptr.red = colour_store_t{
-			name: "red2",
+			name: string("red2"),
 			hue: Hue,
 			sat: Saturation,
 			value: Value,
@@ -119,7 +119,7 @@ void StoreToPtr(void* userdata) {
 		break;
 		case Green:
 		ptr.green = colour_store_t{
-			name: "green",
+			name: string("green"),
 			hue: Hue,
 			sat: Saturation,
 			value: Value,
@@ -311,7 +311,7 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 			return 0;
 		
 		if( my_data.state == 98 ) {
-			Write("config.json", my_data)
+			Write(string("config.json"), my_data)
 		}
 		if( my_data.state >= Red2 && my_data.state <= Yellow ) {
 			/*
