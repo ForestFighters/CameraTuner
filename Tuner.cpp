@@ -44,13 +44,38 @@ int Hue = 0;
 int Saturation = 0;
 int Value = 0;
 
+typedef struct colour_store {
+	char[] name;
+	int hue;
+	int sat;
+	int value;
+} colour_store_t;
+
 typedef struct custom_data
 {
     int state;
+	colour_store_t red;
+	colour_store_t red2;
+	colour_store_t blue;
+	colour_store_t green;
+	colour_store_t yellow;
     pthread_mutex_t mtx;
 } custom_data_t;
 
-void Save(char[] filename, void* userdata) {
+
+void Write(char[] filename, custom_data_t data) {
+	ofstream myfile;
+	myfile.open(filename);
+	// iterate data
+	myfile << '[{"colorName": "' + data.red.name + '", "hue": "' + data.red.hue + '", "saturation": "' + data.red.sat + '", "value": "' + data.red.value + '"},\n';
+	myfile << '{"colorName": "' + data.red2.name + '", "hue": "' + data.red2.hue + '", "saturation": "' + data.red2.sat + '", "value": "' + data.red2.value + '"},\n';
+	myfile << '[{"colorName": "' + data.green.name + '", "hue": "' + data.green.hue + '", "saturation": "' + data.green.sat + '", "value": "' + data.green.value + '"},\n';
+	myfile << '[{"colorName": "' + data.yellow.name + '", "hue": "' + data.yellow.hue + '", "saturation": "' + data.yellow.sat + '", "value": "' + data.yellow.value + '"},\n';
+	myfile << '[{"colorName": "' + data.blue.name + '", "hue": "' + data.blue.hue + '", "saturation": "' + data.blue.sat + '", "value": "' + data.blue.value + '"}]\n';
+	myfile.close();
+}
+
+void StoreToPtr(void* userdata) {
 	custom_data_t* ptr = (custom_data_t*)userdata;
     if (!ptr)
     {
@@ -61,22 +86,46 @@ void Save(char[] filename, void* userdata) {
 	char[] stateName;
     switch ptr->state {
 		case Red:
-		stateName = "red"
+		ptr.red = colour_store_t{
+			name: "red",
+			hue: Hue,
+			sat: Saturation,
+			value: Value,
+		};
 		break;
 		case Blue:
-		stateName = "blue"
+		ptr.blue = colour_store_t{
+			name: "blue",
+			hue: Hue,
+			sat: Saturation,
+			value: Value,
+		};
 		break;
 		case Yellow:
-		stateName = "yellow"
+		ptr.green = colour_store_t{
+			name: "green",
+			hue: Hue,
+			sat: Saturation,
+			value: Value,
+		};
 		break;
 		case Red2:
-		stateName = "red2"
+		ptr.red = colour_store_t{
+			name: "red2",
+			hue: Hue,
+			sat: Saturation,
+			value: Value,
+		};
+		break;
+		case Green:
+		ptr.green = colour_store_t{
+			name: "green",
+			hue: Hue,
+			sat: Saturation,
+			value: Value,
+		};
 		break;
 	}
-	ofstream myfile;
-	myfile.open(filename);
-	myfile << '{"colorName": "' + stateName + '", "hue": "' + Hue + '", "saturation": "' + Saturation + '", "value": "' + Value + '"}\n';
-	myfile.close();
 }
 
 void my_button_cb(int event, int x, int y, int flags, void* userdata)
@@ -111,7 +160,8 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
 			ptr->state = 99;		
 		}
 		else if(saveRect.contains(Point(x, y))) {
-			Save("settings.json", userdata)
+			StoreToPtr(userdata);
+			ptr->state = 98;
 		}
 		else if( red2Rect.contains(Point(x, y)) ) {			
 			ptr->state = Red2;			
@@ -259,7 +309,10 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 
 		if( my_data.state == 99 )
 			return 0;
-			
+		
+		if( my_data.state == 98 ) {
+			Write("config.json", my_data)
+		}
 		if( my_data.state >= Red2 && my_data.state <= Yellow ) {
 			/*
 			cvSetTrackbarPos("LowH", CONTROLHSV,  lowH[my_data.state]);
