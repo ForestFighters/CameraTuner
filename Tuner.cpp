@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <pthread.h>
+#include <fstream>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
@@ -66,8 +67,8 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
 	Rect blueRect   = Rect(150,0, 150, 50);
 	Rect greenRect  = Rect(0,50, 150, 50);
 	Rect yellowRect = Rect(150,50, 150, 50);
-    
-    Rect exitRect = Rect(0,100, 300, 50);
+    Rect saveRect = Rect(0,100,150,50);
+    Rect exitRect = Rect(150,100, 150, 50);
 
 	// lock mutex to protect data from being modified by the
 	// main() thread
@@ -78,7 +79,10 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
         std::cout << "Button Up" << std::endl;        
 
 		if( exitRect.contains(Point(x, y)) ) {			
-			ptr->state = 99;			
+			Save("settings.json")			
+		}
+		else if(saveRect.contains(Point(x, y))) {
+			ptr->state = 98;
 		}
 		else if( red2Rect.contains(Point(x, y)) ) {			
 			ptr->state = Red2;			
@@ -115,6 +119,29 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
     }
 }  
 
+
+void Save(char[] filename) {
+	pthread_mutex_lock(&ptr->mtx);
+	char[] stateName;
+    switch ptr->state {
+		case Red:
+		stateName = "red"
+		break;
+		case Blue:
+		stateName = "blue"
+		break;
+		case Yellow:
+		stateName = "yellow"
+		break;
+		case Red2:
+		stateName = "red2"
+		break;
+	}
+	ofstream myfile;
+	myfile.open(filename);
+	myfile << '{"colorName": "' + stateName + '", "hue": "' + Hue + '", "saturation": "' + Saturation + '", "value": "' + Value + '"}\n';
+	myfile.close();
+}
 
  int main( int argc, char** argv )
  {
