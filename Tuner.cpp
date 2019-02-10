@@ -72,7 +72,7 @@ void Write(string filename, custom_data_t data) {
 	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.green.name, data.green.hue, data.green.sat, data.green.value);
 	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.blue.name, data.blue.hue, data.blue.sat, data.blue.value);
 	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"}]\n', data.yellow.name, data.yellow.hue, data.yellow.sat, data.yellow.value);
-	myfile.close();
+	fclose(myfile);
 }
 
 void StoreToPtr(void* userdata) {
