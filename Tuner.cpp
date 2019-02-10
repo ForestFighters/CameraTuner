@@ -50,7 +50,13 @@ typedef struct custom_data
     pthread_mutex_t mtx;
 } custom_data_t;
 
-void Save(char[] filename) {
+void Save(char[] filename, void* userdata) {
+	custom_data_t* ptr = (custom_data_t*)userdata;
+    if (!ptr)
+    {
+        std::cout << "@Save userdata is empty" << std::endl;
+        return;
+    }
 	pthread_mutex_lock(&ptr->mtx);
 	char[] stateName;
     switch ptr->state {
@@ -102,10 +108,10 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
         std::cout << "Button Up" << std::endl;        
 
 		if( exitRect.contains(Point(x, y)) ) {			
-			Save("settings.json")			
+			ptr->state = 99;		
 		}
 		else if(saveRect.contains(Point(x, y))) {
-			ptr->state = 98;
+			Save("settings.json", userdata)
 		}
 		else if( red2Rect.contains(Point(x, y)) ) {			
 			ptr->state = Red2;			
