@@ -11,31 +11,31 @@
 using namespace cv;
 using namespace std;
 
-enum Colours { Red2, Red, Green, Blue, Yellow, None };
+enum Colours { Red, Green, Blue, Yellow, None };
 
-//int lowH[5] = {   0, 150, 51,  75, 20 };
-//int highH[5] = { 10, 230, 75, 107, 35 };
+//int lowY[5] = {   0, 150, 51,  75, 20 };
+//int highY[5] = { 10, 230, 75, 107, 35 };
 
-//int lowS[5] = {  158, 128, 127, 127,  85 };
-//int highS[5] = { 255, 255, 255, 255, 255 };
+//int lowU[5] = {  158, 128, 127, 127,  85 };
+//int highU[5] = { 255, 255, 255, 255, 255 };
 
 //int lowV[5] = {  158,   0, 127, 127, 150 };
 //int highV[5] = { 255, 255, 255, 255, 255 };
 
-//int lowH[5] = {   0, 150, 90,  90, 20 };
-//int highH[5] = { 10, 230, 119, 119, 35 };
+//int lowY[5] = {   0, 150, 90,  90, 20 };
+//int highY[5] = { 10, 230, 119, 119, 35 };
 
-//int lowS[5] = {  158, 128, 96, 200,    0 };
-//int highS[5] = { 255, 255, 191, 255, 117 };
+//int lowU[5] = {  158, 128, 96, 200,    0 };
+//int highU[5] = { 255, 255, 191, 255, 117 };
 
 //int lowV[5] = {  158,   0,   0,   0, 150 };
 //int highV[5] = { 255, 255, 255, 255, 255 };
 
-int lowH[5] =    {   0, 150, 44,  90, 22 };
-int highH[5] =   {  10, 230, 89, 119, 46 };
+int lowY[5] =    {   0, 150, 44,  90, 22 };
+int highY[5] =   {  10, 230, 89, 119, 46 };
 
-int lowS[5] =    {  71, 128,  30,  200,   0 };
-int highS[5] =   { 255, 255, 166,  255, 132 };
+int lowU[5] =    {  71, 128,  30,  200,   0 };
+int highU[5] =   { 255, 255, 166,  255, 132 };
 
 int lowV[5] =    { 158,   0,  90,   0, 209 };
 int highV[5] =   { 255, 255, 143, 255, 255 };
@@ -44,88 +44,48 @@ int Hue = 0;
 int Saturation = 0;
 int Value = 0;
 
-typedef struct colour_store {
-	string name;
-	int hue;
-	int sat;
-	int value;
-} colour_store_t;
-
 typedef struct custom_data
 {
     int state;
-	colour_store_t red;
-	colour_store_t red2;
-	colour_store_t blue;
-	colour_store_t green;
-	colour_store_t yellow;
     pthread_mutex_t mtx;
 } custom_data_t;
 
 
-void Write(string filename, custom_data_t data) {
+void Write() {
 	FILE* myfile;
-	myfile = fopen("config.json","w");
-	char* output;
-	fprintf(myfile, '[{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.red.name, data.red.hue, data.red.sat, data.red.value);
-	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.red2.name, data.red2.hue, data.red2.sat, data.red2.value);
-	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.green.name, data.green.hue, data.green.sat, data.green.value);
-	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"},\n', data.blue.name, data.blue.hue, data.blue.sat, data.blue.value);
-	fprintf(myfile, '{"colorName": "%s", "hue": "%d", "saturation": "%d", "value": "%d"}]\n', data.yellow.name, data.yellow.hue, data.yellow.sat, data.yellow.value);
+	myfile = fopen("config.txt","w");	
+	
+	fprintf(myfile, "let red_lower = core::Scalar { \n");
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Red], lowU[Red], lowV[Red]);
+    fprintf(myfile, "}; \n");
+    fprintf(myfile, "let red_upper = core::Scalar {  \n");
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Red], highU[Red], highV[Red]);
+    fprintf(myfile, "}; \n");
+
+    fprintf(myfile, "let blue_lower = core::Scalar { \n");
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Blue], lowU[Blue], lowV[Blue]);
+    fprintf(myfile, "}; \n");
+    fprintf(myfile, "let blue_upper = core::Scalar { \n" );
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Blue], highU[Blue], highV[Blue]);
+    fprintf(myfile, "}; \n");
+
+    fprintf(myfile, "let yellow_lower = core::Scalar { \n");
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Yellow], lowU[Yellow], lowV[Yellow]);
+    fprintf(myfile, "}; \n");
+    fprintf(myfile, "let yellow_upper = core::Scalar { \n");
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Yellow], highU[Yellow], highV[Yellow]);
+    fprintf(myfile, "}; \n");
+
+    fprintf(myfile, "let green_lower = core::Scalar { \n");
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Green], lowU[Green], lowV[Green]);
+    fprintf(myfile, "}; \n");
+    fprintf(myfile, "let green_upper = core::Scalar { \n");
+    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Green], highU[Green], highV[Green]);
+    fprintf(myfile, "}; \n");
+    
 	fclose(myfile);
 }
 
-void StoreToPtr(void* userdata) {
-	custom_data_t* ptr = (custom_data_t*)userdata;
-    if (!ptr)
-    {
-        std::cout << "@Save userdata is empty" << std::endl;
-        return;
-    }
-	pthread_mutex_lock(&ptr->mtx);
-    switch(ptr->state) {
-		case Red:
-		ptr->red = colour_store_t{
-			name: string("red"),
-			hue: Hue,
-			sat: Saturation,
-			value: Value,
-		};
-		break;
-		case Blue:
-		ptr->blue = colour_store_t{
-			name: string("blue"),
-			hue: Hue,
-			sat: Saturation,
-			value: Value,
-		};
-		break;
-		case Yellow:
-		ptr->green = colour_store_t{
-			name: string("green"),
-			hue: Hue,
-			sat: Saturation,
-			value: Value,
-		};
-		break;
-		case Red2:
-		ptr->red = colour_store_t{
-			name: string("red2"),
-			hue: Hue,
-			sat: Saturation,
-			value: Value,
-		};
-		break;
-		case Green:
-		ptr->green = colour_store_t{
-			name: string("green"),
-			hue: Hue,
-			sat: Saturation,
-			value: Value,
-		};
-		break;
-	}
-}
 
 void my_button_cb(int event, int x, int y, int flags, void* userdata)
 {
@@ -138,14 +98,13 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
         std::cout << "@my_button_cb userdata is empty" << std::endl;
         return;
     }
-
-	Rect red2Rect   = Rect(0,0, 75, 50);
-	Rect redRect    = Rect(75,0, 75, 50);
+	
+	Rect redRect    = Rect(0,0, 150, 50);
 	Rect blueRect   = Rect(150,0, 150, 50);
 	Rect greenRect  = Rect(0,50, 150, 50);
 	Rect yellowRect = Rect(150,50, 150, 50);
-    Rect saveRect = Rect(0,100,150,50);
-    Rect exitRect = Rect(150,100, 150, 50);
+    Rect exitRect 	= Rect(0,100,150,50);
+    Rect saveRect 	= Rect(150,100, 150, 50);
 
 	// lock mutex to protect data from being modified by the
 	// main() thread
@@ -153,19 +112,13 @@ void my_button_cb(int event, int x, int y, int flags, void* userdata)
     ptr->state = -1;
     if (event == EVENT_LBUTTONUP)
     {
-        std::cout << "Button Up" << std::endl;        
-
+        //std::cout << "Button Up" << std::endl;        
 		if( exitRect.contains(Point(x, y)) ) {			
 			ptr->state = 99;		
 		}
-		else if(saveRect.contains(Point(x, y))) {
-			cout << "storing data to pointer" << endl;
-			StoreToPtr(userdata);
+		else if(saveRect.contains(Point(x, y))) {						
 			ptr->state = 98;
-		}
-		else if( red2Rect.contains(Point(x, y)) ) {			
-			ptr->state = Red2;			
-		}
+		}		
 		else if( redRect.contains(Point(x, y)) ) {			
 			ptr->state = Red;			
 		}
@@ -222,34 +175,32 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 	custom_data_t my_data = { -1 };
 	cvSetMouseCallback(CONTROLYUV, my_button_cb, &my_data ); 
 		
-	int iLowH = 0;
-	int iHighH = 255;
+	int ilowY = 0;
+	int ihighY = 255;
 
-	int iLowS = 0; 
-	int iHighS = 255;
+	int ilowU = 0; 
+	int ihighU = 255;
 
 	int iLowV = 0;
 	int iHighV = 255;
 
 	//Create trackbars in CONTROLYUV window
 	
-	cvCreateTrackbar("LowY", CONTROLYUV, &iLowH, 255); //Hue (0 - 179)
-	cvCreateTrackbar("HighY", CONTROLYUV, &iHighH, 255);
-	cvCreateTrackbar("LowU", CONTROLYUV, &iLowS, 255); //Saturation (0 - 255)
-	cvCreateTrackbar("HighU", CONTROLYUV, &iHighS, 255);
+	cvCreateTrackbar("LowY", CONTROLYUV, &ilowY, 255); //Hue (0 - 179)
+	cvCreateTrackbar("HighY", CONTROLYUV, &ihighY, 255);
+	cvCreateTrackbar("LowU", CONTROLYUV, &ilowU, 255); //Saturation (0 - 255)
+	cvCreateTrackbar("HighU", CONTROLYUV, &ihighU, 255);
 	cvCreateTrackbar("LowV", CONTROLYUV, &iLowV, 255); //Value (0 - 255)
 	cvCreateTrackbar("HighV", CONTROLYUV, &iHighV, 255);
 	
 	string buttonText("Exit");
-	string saveText("Save");
+	string saveText("Start  ");
 	putText(imgControl, buttonText, Point(50, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));
-	putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));
-	rectangle(imgControl,Point(0,0),Point(75,50),Scalar(0,0,128),CV_FILLED);
-	rectangle(imgControl,Point(75,0),Point(150,50),Scalar(0,0,255),CV_FILLED);
+	putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));	
+	rectangle(imgControl,Point(0,0),Point(150,50),Scalar(0,0,255),CV_FILLED);
 	rectangle(imgControl,Point(150,0),Point(300,50),Scalar(255,0,0),CV_FILLED);
 	rectangle(imgControl,Point(0,50),Point(150,100),Scalar(0,255,0),CV_FILLED);
-	rectangle(imgControl,Point(150,50),Point(300,100),Scalar(0,255,255),CV_FILLED);
-	
+	rectangle(imgControl,Point(150,50),Point(300,100),Scalar(0,255,255),CV_FILLED);	
 	
 	imshow(CONTROLYUV, imgControl);
 
@@ -262,16 +213,19 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
     namedWindow("Colour Space", CV_WINDOW_AUTOSIZE);    
     setMouseCallback("Colour Space", onMouse, &imgHSV); // pass the address
     
+    bool saving = false;
+    
+    int current = None;
+    
 	while (true)
 	{
 		bool bSuccess = cap.read(imgOriginal); // read a new frame from video
 
 		if (!bSuccess) //if not success, break loop
 		{
-			 cout << "Cannot read a frame from video stream" << endl;
+			 cout << "Cannot reamy_data.stated a frame from video stream" << endl;
 			 break;
 		}
-
 		//Extract a region of interest from the grey scale frame
 		Rect roi(0,0,640,80);  
 		imgOriginal(roi).copyTo(imgROI);
@@ -280,7 +234,7 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 		cvtColor(imgROI, imgHSV, COLOR_BGR2YUV); //Convert the captured frame from BGR to YUV
 
 		Mat imgThresholded;
-		inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
+		inRange(imgHSV, Scalar(ilowY, ilowU, iLowV), Scalar(ihighY, ihighU, iHighV), imgThresholded); //Threshold the image
 		  
 		//morphological opening (remove small objects from the foreground)
 		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
@@ -307,45 +261,75 @@ void onMouse(int event, int x, int y, int flags, void* param) // now it's in par
 		pthread_mutex_lock(&my_data.mtx);
 		//std::cout << "The state retrieved by the callback is: " << my_data.state << std::endl; 		   
 		pthread_mutex_unlock(&my_data.mtx);
+			
 
 		if( my_data.state == 99 )
 			return 0;
 		
+		// Use state 98 to enable and disable saving values
 		if( my_data.state == 98 ) {
-			cout << "writing pointer to config.json" << endl;
-			Write(string("config.json"), my_data);
+		  rectangle(imgControl,Point(150,100),Point(300,150),Scalar(200,200,200),CV_FILLED);
+		  if( saving ) {
+			  string saveText("Start   ");	
+			  putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));	
+			  cout << "Finish saving and write out file" << endl;				
+			  Write();
+			  saving = false;
+		  } else  {
+			  string saveText("Save  ");	
+			  putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));	
+			  cout << "Start saving" << endl;
+			  saving = true;
+		  }		 
+		  imshow(CONTROLYUV, imgControl);
 		}
-		if( my_data.state >= Red2 && my_data.state <= Yellow ) {
-			/*
-			cvSetTrackbarPos("LowH", CONTROLHSV,  lowH[my_data.state]);
-			cvSetTrackbarPos("HighH", CONTROLHSV, highH[my_data.state]);
-			cvSetTrackbarPos("LowS", CONTROLHSV,  lowS[my_data.state]);
-			cvSetTrackbarPos("HighS", CONTROLHSV, highS[my_data.state]);
-			cvSetTrackbarPos("LowV", CONTROLHSV,  lowV[my_data.state]);
-			cvSetTrackbarPos("HighV", CONTROLHSV, highV[my_data.state]);		
-			*/
-			
-			cvSetTrackbarPos("LowY", CONTROLYUV,  lowH[my_data.state]);
-			cvSetTrackbarPos("HighY", CONTROLYUV, highH[my_data.state]);
-			cvSetTrackbarPos("LowU", CONTROLYUV,  lowS[my_data.state]);
-			cvSetTrackbarPos("HighU", CONTROLYUV, highS[my_data.state]);
-			cvSetTrackbarPos("LowV", CONTROLYUV,  lowV[my_data.state]);
-			cvSetTrackbarPos("HighV", CONTROLYUV, highV[my_data.state]);
-			pthread_mutex_lock(&my_data.mtx);
-			my_data.state = None;
-			pthread_mutex_unlock(&my_data.mtx);		
-		} 
-		else if( Hue > 0) {
-			cvSetTrackbarPos("LowY", CONTROLYUV,  Hue - 15);
-			cvSetTrackbarPos("HighY", CONTROLYUV, Hue + 15);
-			cvSetTrackbarPos("LowU", CONTROLYUV,  Saturation - 15);
-			cvSetTrackbarPos("HighU", CONTROLYUV, Saturation + 15);
-			cvSetTrackbarPos("LowV", CONTROLYUV,  Value - 15);
-			cvSetTrackbarPos("HighV", CONTROLYUV, Value + 15);
+		
+		if( my_data.state >= Red && my_data.state <= Yellow ) {
+			current = my_data.state;
+			if( saving ) {
+				rectangle(imgControl,Point(150,100),Point(300,150),Scalar(200,200,200),CV_FILLED);			
+				if( current == Red ) {
+					string saveText("Saving Red");	
+					putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));	
+				}
+				if( current == Blue ) {
+					string saveText("Saving Blue");	
+					putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));	
+				}
+				if( current == Green ) {
+					string saveText("Saving Green");	
+					putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));	
+				}
+				if( current == Yellow ) {
+					string saveText("Saving Yellow");	
+					putText(imgControl, saveText, Point(180, 130), FONT_HERSHEY_PLAIN, 1, Scalar(0,0,0));	
+				}				
+				imshow(CONTROLYUV, imgControl);
+			}
+		}
+		
+		if( saving && Hue > 0 ) {				
+			lowY[current]  = Hue - 15;
+			highY[current] = Hue + 15;
+			lowU[current]  = Saturation - 15;
+			highU[current] = Saturation + 15;
+			lowV[current]  = Value - 15;
+			highV[current] = Value + 15;
 			Hue = 0;
 		}
 		
-    
+		if( current >= Red && current <= Yellow ) {			
+			cvSetTrackbarPos("LowY", CONTROLYUV,  lowY[current]);
+			cvSetTrackbarPos("HighY", CONTROLYUV, highY[current]);
+			cvSetTrackbarPos("LowU", CONTROLYUV,  lowU[current]);
+			cvSetTrackbarPos("HighU", CONTROLYUV, highU[current]);
+			cvSetTrackbarPos("LowV", CONTROLYUV,  lowV[current]);
+			cvSetTrackbarPos("HighV", CONTROLYUV, highV[current]);			
+		} 		    		
+		
+		pthread_mutex_lock(&my_data.mtx);
+		my_data.state = None;
+		pthread_mutex_unlock(&my_data.mtx);	
    }
    return 0;
 }
