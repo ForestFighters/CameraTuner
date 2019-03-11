@@ -40,9 +40,7 @@ int highU[5] =   { 255, 255, 166,  255, 132 };
 int lowV[5] =    { 158,   0,  90,   0, 209 };
 int highV[5] =   { 255, 255, 143, 255, 255 };
 
-int Hue = 0;
-int Saturation = 0;
-int Value = 0;
+int Hue = 0; int Saturation = 0; int Value = 0;
 
 typedef struct custom_data
 {
@@ -53,36 +51,19 @@ typedef struct custom_data
 
 void Write() {
 	FILE* myfile;
-	myfile = fopen("config.txt","w");	
+	myfile = fopen("calibrate.json","w");	
+
+	fprintf(myfile, "{ \n");
+	fprintf(myfile, "\"red_lower\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n],\n", lowY[Red], lowU[Red], lowV[Red]);	
+	fprintf(myfile, "\"red_upper\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n],\n", highY[Red], highU[Red], highV[Red]);		
+	fprintf(myfile, "\"green_lower\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n],\n", lowY[Green], lowU[Green], lowV[Green]);
+	fprintf(myfile, "\"green_upper\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n],\n", highY[Green], highU[Green], highV[Green]);
+	fprintf(myfile, "\"blue_lower\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n],\n", lowY[Blue], lowU[Blue], lowV[Blue]);
+	fprintf(myfile, "\"blue_upper\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n],\n", highY[Blue], highU[Blue], highV[Blue]);		
+	fprintf(myfile, "\"yellow_lower\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n],\n", lowY[Yellow], lowU[Yellow], lowV[Yellow]);		
+	fprintf(myfile, "\"yellow_upper\": [\n %d.0,\n %d.0,\n %d.0,\n -1.0\n]\n", highY[Yellow], highU[Yellow], highV[Yellow]);
 	
-	fprintf(myfile, "let red_lower = core::Scalar { \n");
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Red], lowU[Red], lowV[Red]);
-    fprintf(myfile, "}; \n");
-    fprintf(myfile, "let red_upper = core::Scalar {  \n");
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Red], highU[Red], highV[Red]);
-    fprintf(myfile, "}; \n");
-
-    fprintf(myfile, "let blue_lower = core::Scalar { \n");
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Blue], lowU[Blue], lowV[Blue]);
-    fprintf(myfile, "}; \n");
-    fprintf(myfile, "let blue_upper = core::Scalar { \n" );
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Blue], highU[Blue], highV[Blue]);
-    fprintf(myfile, "}; \n");
-
-    fprintf(myfile, "let yellow_lower = core::Scalar { \n");
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Yellow], lowU[Yellow], lowV[Yellow]);
-    fprintf(myfile, "}; \n");
-    fprintf(myfile, "let yellow_upper = core::Scalar { \n");
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Yellow], highU[Yellow], highV[Yellow]);
-    fprintf(myfile, "}; \n");
-
-    fprintf(myfile, "let green_lower = core::Scalar { \n");
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", lowY[Green], lowU[Green], lowV[Green]);
-    fprintf(myfile, "}; \n");
-    fprintf(myfile, "let green_upper = core::Scalar { \n");
-    fprintf(myfile, "    data: [%df64, %df64, %df64, -1f64], \n", highY[Green], highU[Green], highV[Green]);
-    fprintf(myfile, "}; \n");
-    
+	fprintf(myfile, "}\n");
 	fclose(myfile);
 }
 
